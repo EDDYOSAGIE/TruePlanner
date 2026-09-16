@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in</title>
+<style>
+  :root {
+    --paper: #f6f4ef;
+    --ink: #24242a;
+    --ink-soft: #6b6a63;
+    --line: #dcd9cf;
+    --accent: #3c4a52;
+    --error: #a35a4a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 380px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 34px 32px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+    text-align: center;
+    margin: 0 0 6px;
+  }
+
+  .tagline {
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin: 0 0 28px;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  input {
+    width: 100%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 14px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    margin-bottom: 16px;
+  }
+
+  button.submit {
+    width: 100%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    font-style: italic;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 11px;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+
+  button.submit:disabled { opacity: 0.6; cursor: default; }
+
+  .error {
+    font-size: 12.5px;
+    color: var(--error);
+    text-align: center;
+    margin: -6px 0 14px;
+    display: none;
+  }
+
+  .error.show { display: block; }
+
+  .switch {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 20px;
+  }
+
+  .switch a {
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1 id="form-title">Welcome back</h1>
+  <p class="tagline">Today's plan, and the quiet check-ins that come with it.</p>
+
+  <div class="error" id="error-msg"></div>
+
+  <form id="auth-form">
+    <label for="email">Email</label>
+    <input type="email" id="email" required autocomplete="email">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" required autocomplete="current-password" minlength="8">
+
+    <button type="submit" class="submit" id="submit-btn">Sign in</button>
+  </form>
+
+  <p class="switch">
+    <span id="switch-text">Don't have an account?</span>
+    <a id="switch-link">Sign up</a>
+  </p>
+</div>
+
+<script>
+  let mode = 'login'; // 'login' | 'signup'
+
+  const form = document.getElementById('auth-form');
+  const title = document.getElementById('form-title');
+  const submitBtn = document.getElementById('submit-btn');
+  const switchText = document.getElementById('switch-text');
+  const switchLink = document.getElementById('switch-link');
+  const errorMsg = document.getElementById('error-msg');
+
+  function setMode(newMode) {
+    mode = newMode;
+    if (mode === 'login') {
+      title.textContent = 'Welcome back';
+      submitBtn.textContent = 'Sign in';
+      switchText.textContent = "Don't have an account?";
+      switchLink.textContent = 'Sign up';
+      document.getElementById('password').autocomplete = 'current-password';
+    } else {
+      title.textContent = 'Create an account';
+      submitBtn.textContent = 'Sign up';
+      switchText.textContent = 'Already have an account?';
+      switchLink.textContent = 'Sign in';
+      document.getElementById('password').autocomplete = 'new-password';
+    }
+    errorMsg.classList.remove('show');
+  }
+
+  switchLink.addEventListener('click', () => setMode(mode === 'login' ? 'signup' : 'login'));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.classList.remove('show');
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = mode === 'login' ? 'Signing in…' : 'Creating account…';
+
+    try {
+      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/signup';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password, timezone })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorMsg.textContent = data.error || 'Something went wrong.';
+        errorMsg.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = mode === 'login' ? 'Sign in' : 'Sign up';
+        return;
+      }
+
+      window.location.href = '/';
+    } catch (err) {
+      errorMsg.textContent = 'Could not reach the server.';
+      errorMsg.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.textContent = mode === 'login' ? 'Sign in' : 'Sign up';
+    }
+  });
+</script>
+</body>
+</html>
