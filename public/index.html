@@ -1,421 +1,1023 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plan</title>
-<style>
-  :root {
-    --paper: #f6f4ef;
-    --ink: #24242a;
-    --ink-soft: #6b6a63;
-    --line: #dcd9cf;
-    --accent: #3c4a52;
-    --accent-soft: #eef1ef;
-    --pending: #8a8578;
-    --done: #3c6b52;
-    --skipped: #a35a4a;
-    --shrunk: #8a6a3c;
-    --rescheduled: #4a5c8a;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruePlanner — Plan with clarity</title>
+  <style>
+    :root {
+      --bg: #f4f1ec;
+      --panel: #f8f5f1;
+      --ink: #1f1f24;
+      --muted: #66615d;
+      --line: rgba(31, 31, 36, 0.12);
+      --dark: #201d2c;
+      --dark-2: #2c2738;
+      --green: #8ec5ab;
+      --green-deep: #2f6f59;
+      --peach: #f3d7c3;
+      --purple: #b798d8;
+      --shadow: 0 22px 60px rgba(31, 31, 36, 0.08);
+    }
 
-  * { box-sizing: border-box; }
+    * { box-sizing: border-box; }
 
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: Georgia, 'Times New Roman', serif;
-    min-height: 100vh;
-    padding: 48px 20px 80px;
-  }
+    html { scroll-behavior: smooth; }
 
-  .wrap {
-    max-width: 640px;
-    margin: 0 auto;
-  }
+    body {
+      margin: 0;
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
 
-  header {
-    text-align: center;
-    margin-bottom: 8px;
-  }
+    a { color: inherit; text-decoration: none; }
 
-  h1 {
-    font-size: 26px;
-    font-weight: 400;
-    font-style: italic;
-    margin: 0 0 6px;
-  }
+    .site-shell {
+      min-height: 100vh;
+    }
 
-  .tagline {
-    font-size: 14px;
-    color: var(--ink-soft);
-    margin: 0 0 10px;
-  }
+    .topbar {
+      background: rgba(29, 23, 37, 0.96);
+      color: rgba(255,255,255,0.92);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+    }
 
-  .today-date {
-    font-size: 12.5px;
-    color: var(--accent);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin: 0 0 12px;
-    font-style: normal;
-  }
+    .topbar-inner,
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
 
-  .logout-btn {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 12px;
-    background: transparent;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 5px 14px;
-    color: var(--ink-soft);
-    margin-bottom: 20px;
-  }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 74px;
+      gap: 20px;
+    }
 
-  .push-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin-bottom: 36px;
-  }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
+      font-weight: 600;
+    }
 
-  button {
-    font-family: Georgia, 'Times New Roman', serif;
-    cursor: pointer;
-  }
+    .brand-mark {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green), #d6f0df);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.16);
+    }
 
-  #enable-push {
-    display: none;
-    font-size: 13px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 14px;
-  }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.92rem;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
-  section {
-    background: rgba(255,255,255,0.5);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 24px 26px;
-    margin-bottom: 24px;
-  }
+    .nav a { opacity: 0.8; }
+    .nav a:hover { opacity: 1; }
 
-  h2 {
-    font-size: 16px;
-    font-weight: 400;
-    letter-spacing: 0.3px;
-    margin: 0 0 18px;
-    color: var(--accent);
-  }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+    }
 
-  #task-form {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
-    gap: 10px;
-    align-items: end;
-  }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.82rem 1.45rem;
+      font-size: 0.96rem;
+      border: 1px solid transparent;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
+    }
 
-  #task-form label {
-    display: block;
-    font-size: 11px;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
-  }
+    .btn:hover { transform: translateY(-1px); }
 
-  #task-form input {
-    width: 100%;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 14px;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: #fff;
-  }
+    .btn-light {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.2);
+      color: white;
+    }
 
-  #task-form button {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 9px 16px;
-    font-size: 14px;
-    height: 38px;
-  }
+    .btn-primary {
+      background: linear-gradient(135deg, #efe2ef, #d9c7ea);
+      color: var(--dark);
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: 0 12px 28px rgba(197, 160, 235, 0.28);
+    }
 
-  #task-form textarea {
-    width: 100%;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 13.5px;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: #fff;
-    resize: vertical;
-  }
+    .hero {
+      padding: 64px 0 80px;
+    }
 
-  .desc-row {
-    grid-column: 1 / -1;
-    margin-top: 6px;
-  }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 42px;
+      align-items: center;
+    }
 
-  .desc-row label {
-    display: block;
-    font-size: 11px;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
-  }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.3);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
 
-  .optional {
-    font-style: italic;
-  }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(3.2rem, 4.5vw, 5rem);
+      line-height: 0.94;
+      letter-spacing: -0.06em;
+      font-weight: 500;
+      max-width: 620px;
+    }
 
-  #task-list { margin-top: 22px; }
+    .hero-copy {
+      margin-top: 24px;
+      max-width: 560px;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
 
-  .task-row {
-    display: grid;
-    grid-template-columns: 100px 1fr 90px auto;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    border-top: 1px solid var(--line);
-    font-size: 14px;
-  }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
 
-  .task-time { color: var(--ink-soft); font-size: 12.5px; }
+    .btn-cta {
+      padding: 1rem 1.6rem;
+      border-radius: 999px;
+      font-size: 1rem;
+    }
 
-  .task-status {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-  }
+    .ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
 
-  .status-pending .task-status { color: var(--pending); }
-  .status-done .task-status { color: var(--done); }
-  .status-skipped .task-status { color: var(--skipped); }
-  .status-shrunk .task-status { color: var(--shrunk); }
-  .status-rescheduled .task-status { color: var(--rescheduled); }
+    .mini-proof {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-top: 30px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
 
-  .task-action {
-    font-size: 12px;
-    background: transparent;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 5px 10px;
-    color: var(--ink);
-  }
+    .mini-proof strong {
+      color: var(--ink);
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
 
-  #scan-now {
-    font-size: 12.5px;
-    background: transparent;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 8px 14px;
-    color: var(--ink-soft);
-  }
+    .visual {
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-  .checkin-item {
-    display: flex;
-    gap: 14px;
-    padding: 10px 0;
-    border-top: 1px solid var(--line);
-    font-size: 14px;
-  }
+    .card-scene {
+      position: relative;
+      width: min(450px, 90%);
+      aspect-ratio: 0.85;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.48), rgba(255,255,255,0.22));
+      border: 1px solid rgba(31,31,36,0.14);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
 
-  .checkin-time { color: var(--ink-soft); font-size: 12.5px; min-width: 60px; }
+    .card-scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, #cfd7c1 0%, #b8c9a6 36%, #8ca77f 62%, #637a63 100%);
+      opacity: 0.96;
+    }
 
-  .empty { color: var(--ink-soft); font-size: 13px; font-style: italic; }
+    .card-scene::after {
+      content: "";
+      position: absolute;
+      inset: 6% 10% 10%;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.25);
+      transform: rotate(-14deg);
+      box-shadow: 0 20px 28px rgba(26, 30, 28, 0.14);
+    }
 
-  .fine-print {
-    text-align: center;
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-top: 30px;
-    font-style: italic;
-  }
+    .credit-card {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-12deg);
+      width: 62%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255,255,255,0.36);
+      border-radius: 22px;
+      padding: 18px 20px 20px;
+      z-index: 1;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 14px 38px rgba(32, 29, 44, 0.18);
+    }
 
-  .hidden { display: none; }
+    .credit-card .chip {
+      width: 44px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.83), rgba(220,220,220,0.36));
+      margin-bottom: 36px;
+    }
 
-  .tabs {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 28px;
-  }
+    .credit-card .line {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.48);
+      margin-bottom: 12px;
+    }
 
-  .tab-btn {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 13.5px;
-    background: transparent;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 7px 18px;
-    color: var(--ink-soft);
-  }
+    .credit-card .line.short { width: 54%; }
+    .credit-card .line.medium { width: 65%; }
 
-  .tab-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
+    .floating-panel {
+      position: absolute;
+      right: 12px;
+      bottom: 26px;
+      background: rgba(248, 245, 241, 0.96);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      min-width: 190px;
+      z-index: 2;
+    }
 
-  .section-hint {
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    font-style: italic;
-    margin: -10px 0 14px;
-  }
+    .floating-panel .small {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
 
-  #note-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+    .floating-panel strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-top: 4px;
+    }
 
-  #note-text {
-    width: 100%;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 14px;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
-    resize: vertical;
-  }
+    section { padding: 28px 0 10px; }
 
-  #note-save {
-    align-self: flex-start;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
-    font-size: 13.5px;
-  }
+    .section-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
 
-  .note-status {
-    font-size: 12.5px;
-    color: var(--done);
-    font-style: italic;
-    align-self: center;
-  }
+    .section-header h2 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 3rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-weight: 500;
+    }
 
-  .past-day {
-    padding: 14px 0;
-    border-top: 1px solid var(--line);
-  }
+    .section-header .tag {
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-  .past-day .past-day-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 6px;
-  }
+    .ai-showcase {
+      padding-top: 12px;
+    }
 
-  .past-day .past-day-date {
-    font-size: 15px;
-    font-style: italic;
-  }
+    .ai-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 30px;
+      align-items: center;
+    }
 
-  .past-day .past-day-stats {
-    font-size: 12px;
-    color: var(--ink-soft);
-  }
+    .phone-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 500px;
+      position: relative;
+    }
 
-  .past-day .past-day-note {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--ink);
-  }
+    .phone-frame {
+      position: relative;
+      width: 310px;
+      height: 560px;
+      border-radius: 36px;
+      background: linear-gradient(180deg, #16131f, #27212d);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 28px 60px rgba(27, 21, 34, 0.22);
+      padding: 18px 16px 14px;
+      overflow: hidden;
+    }
 
-  .past-day .past-day-note.empty {
-    color: var(--ink-soft);
-    font-style: italic;
-  }
-</style>
+    .phone-notch {
+      width: 120px;
+      height: 22px;
+      background: rgba(15, 13, 18, 0.9);
+      border-radius: 0 0 18px 18px;
+      margin: 0 auto 12px;
+    }
+
+    .phone-screen {
+      background: linear-gradient(180deg, #f5efe7, #efe2d5);
+      border-radius: 26px;
+      height: calc(100% - 34px);
+      border: 1px solid rgba(0,0,0,0.04);
+      padding: 18px 14px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen-header {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .task-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .task-pill {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(31,31,36,0.08);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      color: var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-pill span:last-child {
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .notification-card {
+      position: absolute;
+      left: 50%;
+      top: 62px;
+      transform: translateX(-50%);
+      width: 260px;
+      background: rgba(22, 18, 30, 0.96);
+      color: rgba(255,255,255,0.9);
+      border-radius: 18px;
+      box-shadow: 0 22px 40px rgba(24, 17, 29, 0.35);
+      padding: 12px 14px 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .notification-title {
+      font-size: 1.05rem;
+      margin: 0 0 6px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .notification-copy {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.72);
+      margin: 0 0 12px;
+    }
+
+    .notification-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .notification-actions button {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: white;
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    .ai-copy {
+      display: grid;
+      gap: 18px;
+    }
+
+    .ai-copy h3 {
+      margin: 0;
+      font-size: clamp(2.2rem, 3vw, 3.3rem);
+      letter-spacing: -0.06em;
+      line-height: 0.98;
+      font-weight: 500;
+    }
+
+    .ai-copy p {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .feature-grid,
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.28);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px 20px;
+      box-shadow: 0 18px 34px rgba(31,31,36,0.03);
+    }
+
+    .feature-card {
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(23, 30, 38, 0.92), rgba(52, 64, 70, 0.82));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      margin-bottom: 22px;
+    }
+
+    .feature-card h3 {
+      margin: 0 0 12px;
+      font-size: 1.7rem;
+      letter-spacing: -0.04em;
+      font-weight: 500;
+    }
+
+    .feature-card p,
+    .pricing-card p,
+    .about-copy,
+    .contact-copy {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .pricing-card {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 330px;
+    }
+
+    .plan-name {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .price {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      font-size: 2.5rem;
+      letter-spacing: -0.05em;
+      font-weight: 500;
+    }
+
+    .price span {
+      font-size: 0.9rem;
+      color: var(--muted);
+      letter-spacing: normal;
+      padding-bottom: 8px;
+    }
+
+    .pricing-card.featured {
+      background: linear-gradient(180deg, rgba(29, 23, 37, 0.96), rgba(38, 33, 48, 0.92));
+      color: rgba(255,255,255,0.92);
+      border-color: rgba(255,255,255,0.06);
+    }
+
+    .pricing-card.featured p,
+    .pricing-card.featured li,
+    .pricing-card.featured .plan-name,
+    .pricing-card.featured .price span {
+      color: rgba(255,255,255,0.72);
+    }
+
+    .pricing-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .pricing-card li::before {
+      content: '✓';
+      margin-right: 8px;
+      color: var(--green-deep);
+      font-weight: 600;
+    }
+
+    .featured li::before { color: var(--green); }
+
+    .pricing-card .btn {
+      margin-top: auto;
+      width: 100%;
+    }
+
+    .about-grid,
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .about-panel {
+      padding: 26px 22px;
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.26), rgba(209, 228, 216, 0.34));
+    }
+
+    .about-mock {
+      width: min(100%, 440px);
+      background: rgba(255,255,255,0.54);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .about-mock .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(31,31,36,0.18);
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.4);
+      min-height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .contact-panel {
+      padding: 28px 22px;
+      background: rgba(22, 18, 30, 0.96);
+      color: rgba(255,255,255,0.88);
+      border-radius: 24px;
+    }
+
+    .contact-panel p,
+    .contact-panel label {
+      color: rgba(255,255,255,0.68);
+    }
+
+    .contact-panel form {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .contact-panel input,
+    .contact-panel textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      color: white;
+      padding: 0.9rem 1rem;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .contact-panel input::placeholder,
+    .contact-panel textarea::placeholder {
+      color: rgba(255,255,255,0.38);
+    }
+
+    footer {
+      padding: 42px 0 80px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .about-grid,
+      .contact-grid,
+      .feature-grid,
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-inner {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 14px 0;
+      }
+
+      .nav {
+        order: 3;
+        width: 100%;
+      }
+
+      .nav-actions {
+        margin-left: 0;
+      }
+
+      .hero {
+        padding-top: 28px;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>Today's plan</h1>
-    <p class="tagline">Lay it out once. Quiet check-ins step in if it slips.</p>
-    <p class="today-date" id="today-date"></p>
-    <button id="logout-btn" class="logout-btn">Sign out</button>
-  </header>
+  <div class="site-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a href="#top" class="brand" aria-label="TruePlanner home">
+          <span class="brand-mark"></span>
+          <span>TruePlanner</span>
+        </a>
 
-  <div class="push-bar">
-    <span id="push-status">Checking notification support…</span>
-    <button id="enable-push">Enable check-ins</button>
+        <nav class="nav" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a class="btn btn-light" href="/login.html?mode=login">Sign in</a>
+          <a class="btn btn-primary" href="/login.html?mode=signup">Sign up</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <div class="eyebrow">Built for calmer planning</div>
+            <h1>Plan the day. Protect your energy.</h1>
+            <p class="hero-copy">
+              TruePlanner helps people turn a full, busy life into a manageable plan — with gentle check-ins, focused priorities, and a clearer path when things slip.
+            </p>
+
+            <div class="cta-row">
+              <a class="btn btn-primary btn-cta" href="/login.html?mode=signup">Start free</a>
+              <a class="btn ghost btn-cta" href="#pricing">See pricing</a>
+            </div>
+
+            <div class="mini-proof">
+              <div><strong>4.9/5</strong><br />Teams love it</div>
+              <div><strong>2x</strong><br />Clearer days</div>
+              <div><strong>24/7</strong><br />Gentle support</div>
+            </div>
+          </div>
+
+          <div class="visual" aria-hidden="true">
+            <div class="card-scene">
+              <div class="credit-card">
+                <div class="chip"></div>
+                <div class="line medium"></div>
+                <div class="line short"></div>
+                <div class="line medium"></div>
+              </div>
+
+              <div class="floating-panel">
+                <div class="small">Weekly focus</div>
+                <strong>Finish key work</strong>
+                <div class="small" style="margin-top: 12px;">4 tasks left</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ai-showcase" id="ai-checkins">
+        <div class="container ai-layout">
+          <div class="phone-wrap">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="notification-card">
+                  <div class="notification-header">
+                    <span>AI check-in</span>
+                    <span>Now</span>
+                  </div>
+                  <h4 class="notification-title">Need a reset?</h4>
+                  <p class="notification-copy">You have 2 key tasks still open and the day is moving fast. Want a calmer next move?</p>
+                  <div class="notification-actions">
+                    <button>Cut it</button>
+                    <button>Shrink it</button>
+                    <button>Move it</button>
+                  </div>
+                </div>
+
+                <div class="screen-header">Today</div>
+                <div class="task-stack">
+                  <div class="task-pill"><span>Deep work sprint</span><span>10:00</span></div>
+                  <div class="task-pill"><span>Client follow-up</span><span>3:30</span></div>
+                  <div class="task-pill"><span>Review notes</span><span>5:00</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-copy">
+            <div class="eyebrow">AI check-ins</div>
+            <h3>Calm guidance when your day starts to drift.</h3>
+            <p>
+              TruePlanner watches the real rhythm of your day and helps you decide what to cut, shrink, or move — without shame or noise.
+            </p>
+            <p>
+              It is a quiet assistant in your pocket: helpful at the moment of friction, and designed to keep momentum without adding stress.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <div class="container">
+          <div class="section-header">
+            <h2>Everything you need to stay on track.</h2>
+            <div class="tag">Smart, quiet, practical</div>
+          </div>
+
+          <div class="feature-grid">
+            <article class="card feature-card">
+              <div>
+                <div class="feature-icon">✓</div>
+                <h3>Daily clarity</h3>
+              </div>
+              <p>Map your most important work into a clean plan that reduces overwhelm and keeps your priorities visible.</p>
+            </article>
+
+            <article class="card feature-card">
+              <div>
+                <div class="feature-icon">◔</div>
+                <h3>Gentle check-ins</h3>
+              </div>
+              <p>Get timely, thoughtful nudges when your plan starts slipping — without guilt, pressure, or panic.</p>
+            </article>
+
+            <article class="card feature-card">
+              <div>
+                <div class="feature-icon">↺</div>
+                <h3>Better momentum</h3>
+              </div>
+              <p>Adjust, reschedule, and restart without losing the thread of your day. Progress feels easier to maintain.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing">
+        <div class="container">
+          <div class="section-header">
+            <h2>Simple pricing that fits real life.</h2>
+            <div class="tag">No hidden fees</div>
+          </div>
+
+          <div class="pricing-grid">
+            <article class="card pricing-card">
+              <div class="plan-name">Starter</div>
+              <div class="price">$0 <span>/ month</span></div>
+              <p>For people testing their new rhythm.</p>
+              <ul>
+                <li>3 active plans</li>
+                <li>Basic daily notes</li>
+                <li>Email support</li>
+              </ul>
+              <a class="btn ghost" href="/login.html?mode=signup">Try free</a>
+            </article>
+
+            <article class="card pricing-card featured">
+              <div class="plan-name">Pro</div>
+              <div class="price">$12 <span>/ month</span></div>
+              <p>For focused professionals who want more control.</p>
+              <ul>
+                <li>Unlimited task planning</li>
+                <li>Smart check-ins</li>
+                <li>Past-day review history</li>
+              </ul>
+              <a class="btn btn-primary" href="/login.html?mode=signup">Start Pro</a>
+            </article>
+
+            <article class="card pricing-card">
+              <div class="plan-name">Team</div>
+              <div class="price">$29 <span>/ month</span></div>
+              <p>For small teams coordinating effort with less friction.</p>
+              <ul>
+                <li>Shared planning workspaces</li>
+                <li>Team check-in summaries</li>
+                <li>Priority support</li>
+              </ul>
+              <a class="btn ghost" href="#contact">Talk to sales</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="container">
+          <div class="section-header">
+            <h2>Made for people carrying a lot.</h2>
+            <div class="tag">Intentional by design</div>
+          </div>
+
+          <div class="about-grid">
+            <div class="card about-panel">
+              <div class="about-mock">
+                <div class="head">
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                  </div>
+                  <span style="font-size:0.8rem; color:var(--muted);">TruePlanner</span>
+                </div>
+                <div class="mini-grid">
+                  <div class="mini-box">Deep work</div>
+                  <div class="mini-box">Recovery</div>
+                  <div class="mini-box">Inbox</div>
+                  <div class="mini-box">Wellbeing</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="about-copy">
+              <p>
+                TruePlanner is designed for real life: when the schedule is crowded, attention is fragmented, and a quiet reminder can be more useful than another push.
+              </p>
+              <p style="margin-top: 18px;">
+                Rather than piling on pressure, it helps you pause, choose the next meaningful step, and move forward with more clarity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact">
+        <div class="container contact-grid">
+          <div class="contact-copy">
+            <div class="section-header" style="display:block; margin-bottom:16px;">
+              <h2>Let’s make planning feel lighter.</h2>
+            </div>
+            <p>
+              Whether you are curious about the product or want to explore a tailored setup, we would love to hear from you.
+            </p>
+          </div>
+
+          <div class="contact-panel">
+            <p>Send a note and we’ll get back to you.</p>
+            <form>
+              <label>
+                <span>Name</span>
+                <input type="text" placeholder="Your name" />
+              </label>
+              <label>
+                <span>Email</span>
+                <input type="email" placeholder="you@example.com" />
+              </label>
+              <label>
+                <span>Message</span>
+                <textarea rows="4" placeholder="Tell us what you need help with..."></textarea>
+              </label>
+              <button type="button" class="btn btn-primary" style="width: fit-content;">Send message</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-row">
+        <div>© 2026 TruePlanner</div>
+        <div>Plan with clarity. Live with less friction.</div>
+      </div>
+    </footer>
   </div>
 
-  <nav class="tabs">
-    <button class="tab-btn active" data-view="today">Today</button>
-    <button class="tab-btn" data-view="past">Past days</button>
-  </nav>
-
-  <div id="view-today">
-
-  <section>
-    <h2>Add a task</h2>
-    <form id="task-form">
-      <div>
-        <label for="title">Task</label>
-        <input type="text" id="title" placeholder="Write proposal draft" required>
-      </div>
-      <div>
-        <label for="start">Start</label>
-        <input type="time" id="start" required>
-      </div>
-      <div>
-        <label for="end">End</label>
-        <input type="time" id="end" required>
-      </div>
-      <button type="submit">Add</button>
-      <div class="desc-row">
-        <label for="description">What does this actually involve? <span class="optional">(optional, but helps a lot)</span></label>
-        <textarea id="description" rows="2" placeholder="e.g. First draft of the Q3 client proposal — needs the pricing table finished before I can send it to Sarah for review."></textarea>
-      </div>
-      <div class="desc-row">
-        <label for="obstacle">What usually gets in the way of this kind of task? <span class="optional">(optional — this is what tips get built from, never guessed)</span></label>
-        <textarea id="obstacle" rows="2" placeholder="e.g. I stop after a few pages because my phone's right there. / I get overwhelmed if I think about the whole chapter at once."></textarea>
-      </div>
-    </form>
-    <div id="task-list"></div>
-  </section>
-
-  <section>
-    <h2>Check-in history</h2>
-    <div id="checkin-list"></div>
-    <button id="scan-now" style="margin-top: 16px;">Scan for check-ins now</button>
-  </section>
-
-  <section>
-    <h2>How did today go?</h2>
-    <p class="section-hint">Optional. A few honest lines — this is just for you to look back on.</p>
-    <form id="note-form">
-      <textarea id="note-text" rows="4" placeholder="What actually happened today, in your own words…"></textarea>
-      <button type="submit" id="note-save">Save note</button>
-      <span id="note-status" class="note-status"></span>
-    </form>
-  </section>
-
-  </div>
-
-  <div id="view-past" class="hidden">
-    <section>
-      <h2>Past days</h2>
-      <div id="past-days-list"></div>
-    </section>
-  </div>
-
-  <p class="fine-print">Built to notice, not to nag.</p>
-</div>
-
-<script src="/app.js"></script>
+  <script>
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((res) => {
+        if (res.ok) {
+          window.location.href = '/dashboard.html';
+        }
+      })
+      .catch(() => undefined);
+  </script>
 </body>
 </html>

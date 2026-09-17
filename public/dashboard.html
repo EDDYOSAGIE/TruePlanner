@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TruePlanner | Dashboard</title>
+<style>
+  :root {
+    --paper: #f6f4ef;
+    --ink: #24242a;
+    --ink-soft: #6b6a63;
+    --line: #dcd9cf;
+    --accent: #3c4a52;
+    --accent-soft: #eef1ef;
+    --pending: #8a8578;
+    --done: #3c6b52;
+    --skipped: #a35a4a;
+    --shrunk: #8a6a3c;
+    --rescheduled: #4a5c8a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    min-height: 100vh;
+    padding: 48px 20px 80px;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 400;
+    font-style: italic;
+    margin: 0 0 6px;
+  }
+
+  .tagline {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+
+  .today-date {
+    font-size: 12.5px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    font-style: normal;
+  }
+
+  .logout-btn {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 12px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 14px;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+  }
+
+  .push-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 36px;
+  }
+
+  button {
+    font-family: Georgia, 'Times New Roman', serif;
+    cursor: pointer;
+  }
+
+  #enable-push {
+    display: none;
+    font-size: 13px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+  }
+
+  section {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px 26px;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    margin: 0 0 18px;
+    color: var(--accent);
+  }
+
+  #task-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  #task-form label {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  #task-form input {
+    width: 100%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  #task-form button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 16px;
+    font-size: 14px;
+    height: 38px;
+  }
+
+  #task-form textarea {
+    width: 100%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13.5px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    resize: vertical;
+  }
+
+  .desc-row {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+  }
+
+  .desc-row label {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  .optional {
+    font-style: italic;
+  }
+
+  #task-list { margin-top: 22px; }
+
+  .task-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 90px auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .task-time { color: var(--ink-soft); font-size: 12.5px; }
+
+  .task-status {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .status-pending .task-status { color: var(--pending); }
+  .status-done .task-status { color: var(--done); }
+  .status-skipped .task-status { color: var(--skipped); }
+  .status-shrunk .task-status { color: var(--shrunk); }
+  .status-rescheduled .task-status { color: var(--rescheduled); }
+
+  .task-action {
+    font-size: 12px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--ink);
+  }
+
+  #scan-now {
+    font-size: 12.5px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 14px;
+    color: var(--ink-soft);
+  }
+
+  .checkin-item {
+    display: flex;
+    gap: 14px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .checkin-time { color: var(--ink-soft); font-size: 12.5px; min-width: 60px; }
+
+  .empty { color: var(--ink-soft); font-size: 13px; font-style: italic; }
+
+  .fine-print {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 30px;
+    font-style: italic;
+  }
+
+  .hidden { display: none; }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .tab-btn {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13.5px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 18px;
+    color: var(--ink-soft);
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .section-hint {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: -10px 0 14px;
+  }
+
+  #note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #note-text {
+    width: 100%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    resize: vertical;
+  }
+
+  #note-save {
+    align-self: flex-start;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 13.5px;
+  }
+
+  .note-status {
+    font-size: 12.5px;
+    color: var(--done);
+    font-style: italic;
+    align-self: center;
+  }
+
+  .past-day {
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .past-day .past-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+
+  .past-day .past-day-date {
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  .past-day .past-day-stats {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .past-day .past-day-note {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .past-day .past-day-note.empty {
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Today's plan</h1>
+    <p class="tagline">Lay it out once. Quiet check-ins step in if it slips.</p>
+    <p class="today-date" id="today-date"></p>
+    <button id="logout-btn" class="logout-btn">Sign out</button>
+  </header>
+
+  <div class="push-bar">
+    <span id="push-status">Checking notification support…</span>
+    <button id="enable-push">Enable check-ins</button>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-view="today">Today</button>
+    <button class="tab-btn" data-view="past">Past days</button>
+  </nav>
+
+  <div id="view-today">
+
+  <section>
+    <h2>Add a task</h2>
+    <form id="task-form">
+      <div>
+        <label for="title">Task</label>
+        <input type="text" id="title" placeholder="Write proposal draft" required>
+      </div>
+      <div>
+        <label for="start">Start</label>
+        <input type="time" id="start" required>
+      </div>
+      <div>
+        <label for="end">End</label>
+        <input type="time" id="end" required>
+      </div>
+      <button type="submit">Add</button>
+      <div class="desc-row">
+        <label for="description">What does this actually involve? <span class="optional">(optional, but helps a lot)</span></label>
+        <textarea id="description" rows="2" placeholder="e.g. First draft of the Q3 client proposal — needs the pricing table finished before I can send it to Sarah for review."></textarea>
+      </div>
+      <div class="desc-row">
+        <label for="obstacle">What usually gets in the way of this kind of task? <span class="optional">(optional — this is what tips get built from, never guessed)</span></label>
+        <textarea id="obstacle" rows="2" placeholder="e.g. I stop after a few pages because my phone's right there. / I get overwhelmed if I think about the whole chapter at once."></textarea>
+      </div>
+    </form>
+    <div id="task-list"></div>
+  </section>
+
+  <section>
+    <h2>Check-in history</h2>
+    <div id="checkin-list"></div>
+    <button id="scan-now" style="margin-top: 16px;">Scan for check-ins now</button>
+  </section>
+
+  <section>
+    <h2>How did today go?</h2>
+    <p class="section-hint">Optional. A few honest lines — this is just for you to look back on.</p>
+    <form id="note-form">
+      <textarea id="note-text" rows="4" placeholder="What actually happened today, in your own words…"></textarea>
+      <button type="submit" id="note-save">Save note</button>
+      <span id="note-status" class="note-status"></span>
+    </form>
+  </section>
+
+  </div>
+
+  <div id="view-past" class="hidden">
+    <section>
+      <h2>Past days</h2>
+      <div id="past-days-list"></div>
+    </section>
+  </div>
+
+  <p class="fine-print">Built to notice, not to nag.</p>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

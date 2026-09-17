@@ -163,7 +163,11 @@
 
   switchLink.addEventListener('click', () => setMode(mode === 'login' ? 'signup' : 'login'));
 
-  form.addEventListener('submit', async (e) => {
+const params = new URLSearchParams(window.location.search);
+    const initialMode = params.get('mode') === 'signup' ? 'signup' : 'login';
+    setMode(initialMode);
+
+    form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorMsg.classList.remove('show');
 
@@ -193,7 +197,7 @@
         return;
       }
 
-      window.location.href = '/';
+      window.location.href = '/dashboard.html';
     } catch (err) {
       errorMsg.textContent = 'Could not reach the server.';
       errorMsg.classList.add('show');
