@@ -20,6 +20,15 @@
       --shadow: 0 22px 60px rgba(31, 31, 36, 0.08);
     }
 
+    html.dark {
+      --bg: #17191a;
+      --panel: #202425;
+      --ink: #f2eee7;
+      --muted: #b5b0a8;
+      --line: rgba(242, 238, 231, 0.16);
+      --shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+    }
+
     * { box-sizing: border-box; }
 
     html { scroll-behavior: smooth; }
@@ -29,7 +38,37 @@
       font-family: Georgia, 'Times New Roman', serif;
       background: var(--bg);
       color: var(--ink);
+      transition: background 0.2s ease, color 0.2s ease;
     }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 999px;
+      color: rgba(255,255,255,0.86);
+      padding: 0.55rem 0.85rem;
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .dark .eyebrow,
+    .dark .card,
+    .dark .contact-panel,
+    .dark .about-mock,
+    .dark .mini-box {
+      background-color: var(--panel);
+      border-color: var(--line);
+    }
+
+    .dark input,
+    .dark textarea {
+      background: #252a2b;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    .dark footer { background: #111313; }
 
     a { color: inherit; text-decoration: none; }
 
@@ -758,6 +797,7 @@
         </nav>
 
         <div class="nav-actions">
+          <button class="theme-toggle" type="button" data-theme-toggle>Dark</button>
           <a class="btn btn-light" href="/login.html?mode=login">Sign in</a>
           <a class="btn btn-primary" href="/login.html?mode=signup">Sign up</a>
         </div>
@@ -905,7 +945,7 @@
 
             <article class="card pricing-card featured">
               <div class="plan-name">Pro</div>
-              <div class="price">$12 <span>/ month</span></div>
+              <div class="price">$20 <span>/ month</span></div>
               <p>For focused professionals who want more control.</p>
               <ul>
                 <li>Unlimited task planning</li>
@@ -917,7 +957,7 @@
 
             <article class="card pricing-card">
               <div class="plan-name">Team</div>
-              <div class="price">$29 <span>/ month</span></div>
+              <div class="price">$50 <span>/ month</span></div>
               <p>For small teams coordinating effort with less friction.</p>
               <ul>
                 <li>Shared planning workspaces</li>
@@ -1010,6 +1050,7 @@
     </footer>
   </div>
 
+  <script src="/theme.js"></script>
   <script>
     fetch('/api/auth/me', { credentials: 'include' })
       .then((res) => {

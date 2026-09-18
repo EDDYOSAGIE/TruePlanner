@@ -19,6 +19,20 @@
     --rescheduled: #4a5c8a;
   }
 
+  html.dark {
+    --paper: #17191a;
+    --ink: #f2eee7;
+    --ink-soft: #b5b0a8;
+    --line: #424849;
+    --accent: #a8c5b6;
+    --accent-soft: #293331;
+    --pending: #b8b09e;
+    --done: #8fc7a7;
+    --skipped: #e09a87;
+    --shrunk: #d6ad72;
+    --rescheduled: #9caedf;
+  }
+
   * { box-sizing: border-box; }
 
   body {
@@ -28,6 +42,19 @@
     font-family: Georgia, 'Times New Roman', serif;
     min-height: 100vh;
     padding: 48px 20px 80px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .theme-toggle {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    padding: 5px 12px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 12px;
   }
 
   .wrap {
@@ -106,6 +133,8 @@
     margin-bottom: 24px;
   }
 
+  html.dark section { background: rgba(32, 36, 37, 0.86); }
+
   h2 {
     font-size: 16px;
     font-weight: 400;
@@ -137,6 +166,10 @@
     border-radius: 6px;
     background: #fff;
   }
+
+  html.dark #task-form input,
+  html.dark #task-form textarea,
+  html.dark #note-text { background: #252a2b; color: var(--ink); }
 
   #task-form button {
     background: var(--accent);
@@ -342,6 +375,7 @@
 <body>
 <div class="wrap">
   <header>
+    <button class="theme-toggle" type="button" data-theme-toggle>Dark</button>
     <h1>Today's plan</h1>
     <p class="tagline">Lay it out once. Quiet check-ins step in if it slips.</p>
     <p class="today-date" id="today-date"></p>
@@ -416,6 +450,7 @@
   <p class="fine-print">Built to notice, not to nag.</p>
 </div>
 
+<script src="/theme.js"></script>
 <script src="/app.js"></script>
 </body>
 </html>

@@ -14,6 +14,15 @@
     --error: #a35a4a;
   }
 
+  html.dark {
+    --paper: #17191a;
+    --ink: #f2eee7;
+    --ink-soft: #b5b0a8;
+    --line: #424849;
+    --accent: #a8c5b6;
+    --error: #e09a87;
+  }
+
   * { box-sizing: border-box; }
 
   body {
@@ -26,6 +35,20 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .theme-toggle {
+    display: block;
+    margin: 0 auto 22px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
   }
 
   .card {
@@ -36,6 +59,10 @@
     border-radius: 12px;
     padding: 34px 32px;
   }
+
+  html.dark .card { background: rgba(32, 36, 37, 0.86); }
+
+  html.dark input { background: #252a2b; color: var(--ink); }
 
   h1 {
     font-size: 22px;
@@ -112,6 +139,7 @@
 </head>
 <body>
 <div class="card">
+  <button class="theme-toggle" type="button" data-theme-toggle>Dark</button>
   <h1 id="form-title">Welcome back</h1>
   <p class="tagline">Today's plan, and the quiet check-ins that come with it.</p>
 
@@ -133,6 +161,7 @@
   </p>
 </div>
 
+<script src="/theme.js"></script>
 <script>
   let mode = 'login'; // 'login' | 'signup'
 
